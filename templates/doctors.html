@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find a Specialist - PCOS Care</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        .doctor-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.2s;
+        }
+
+        .doctor-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .doctor-info h3 {
+            margin: 0 0 5px 0;
+            color: #2c3e50;
+        }
+
+        .doctor-info p {
+            margin: 0;
+            color: #7f8c8d;
+        }
+
+        .specialty-tag {
+            background: #e0f2f1;
+            color: #009688;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .book-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .book-btn:hover {
+            background: #0056b3;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <header style="margin-bottom: 40px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <a href="/" style="text-decoration: none; color: #2c3e50;">&larr; Back to Risk Analysis</a>
+                <a href="/dashboard" style="text-decoration: none; color: #007bff; font-weight: 600;">Doctor
+                    Dashboard</a>
+            </div>
+            <h1>Find a Specialist</h1>
+            <p class="subtitle">Connect with top Gynecologists and Endocrinologists</p>
+        </header>
+
+        <div class="doctor-list">
+            {% for doctor in doctors %}
+            <div class="doctor-card">
+                <div class="doctor-info">
+                    <h3>{{ doctor.name }} <span class="specialty-tag">{{ doctor.specialty }}</span></h3>
+                    <p>📍 {{ doctor.location }} • ⭐ {{ doctor.rating }}</p>
+                    <p style="margin-top: 5px; font-size: 0.9em;">Experise: {{ doctor.expertise }}</p>
+                </div>
+                <button class="book-btn" onclick="openBooking('{{ doctor.id }}', '{{ doctor.name }}')">Book
+                    Visit</button>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Booking Modal -->
+    <div id="bookingModal" class="modal">
+        <div class="modal-content">
+            <h2>Book Appointment</h2>
+            <p>with <span id="docName" style="font-weight: bold;"></span></p>
+
+            <form id="bookingForm" onsubmit="submitBooking(event)">
+                <input type="hidden" id="docId" name="doctor_id">
+
+                <div class="form-group">
+                    <label>Your Name</label>
+                    <input type="text" name="patient_name" required class="form-control"
+                        style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+                <div class="form-group">
+                    <label>Preferred Date</label>
+                    <input type="date" name="date" required class="form-control"
+                        style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+                <div class="form-group">
+                    <label>Reason for Visit</label>
+                    <textarea name="reason" rows="3" required class="form-control"
+                        style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px;"
+                        placeholder="Briefly describe your symptoms..."></textarea>
+                </div>
+
+                <div style="text-align: right; margin-top: 20px;">
+                    <button type="button" onclick="closeModal()"
+                        style="background: #ccc; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; margin-right: 10px;">Cancel</button>
+                    <button type="submit" class="book-btn">Confirm Booking</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openBooking(id, name) {
+            document.getElementById('bookingModal').style.display = 'flex';
+            document.getElementById('docId').value = id;
+            document.getElementById('docName').innerText = name;
+        }
+
+        function closeModal() {
+            document.getElementById('bookingModal').style.display = 'none';
+        }
+
+        async function submitBooking(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                const response = await fetch('/book_appointment', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert('Appointment booked successfully! Doctor will contact you shortly.');
+                    closeModal();
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to book appointment.');
+            }
+        }
+    </script>
+
+</body>
+
+</html>
