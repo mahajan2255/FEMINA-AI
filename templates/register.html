@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join Femina AI</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        body {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #e0f2f1 0%, #f8f9fa 100%);
+        }
+
+        .auth-card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 450px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="auth-card" style="text-align: center;">
+        <div class="logo">Femina AI</div>
+        <p class="subtitle">Create your personal health companion.</p>
+
+        <form id="registerForm" onsubmit="handleRegister(event)" style="text-align: left;">
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" name="full_name" required placeholder="Jane Doe">
+            </div>
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" name="email" required placeholder="name@example.com">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" name="password" required placeholder="Create a strong password">
+            </div>
+
+            <button type="submit" class="btn-primary" style="margin-top: 30px;">Create Account</button>
+        </form>
+
+        <p style="margin-top: 20px; font-size: 0.9em;">
+            Already have an account? <a href="/login" style="color: var(--primary);">Login here</a>.
+        </p>
+    </div>
+
+    <script>
+        async function handleRegister(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                const response = await fetch('/api/v1/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    alert('Account created successfully! Please login.');
+                    window.location.href = '/login';
+                } else {
+                    const result = await response.json();
+                    alert('Registration Failed: ' + result.detail);
+                }
+            } catch (error) {
+                console.error(error);
+                alert('An error occurred. Please try again.');
+            }
+        }
+    </script>
+</body>
+
+</html>

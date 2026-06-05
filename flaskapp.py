@@ -105,6 +105,18 @@ def calculate_uncertainty(probabilities):
 def home():
     return render_template("index.html")
 
+@app.route("/login", methods=["GET"])
+def login_page():
+    return render_template("login.html")
+
+@app.route("/register", methods=["GET"])
+def register_page():
+    return render_template("register.html")
+
+@app.route("/dashboard", methods=["GET"])
+def dashboard_page():
+    return render_template("dashboard.html")
+
 @app.route("/predict", methods=["POST"])
 @swag_from({
     'responses': {
@@ -229,4 +241,4 @@ def doctors_api():
         return jsonify([])
 
 if __name__ == "__main__":
-    app.run(host='127.0.0.1', port=5000, debug=True)
+    app.run(host='127.0.0.1', port=5000, debug=False)

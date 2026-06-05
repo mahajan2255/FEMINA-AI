@@ -3,7 +3,9 @@ import shap
 import pandas as pd
 import numpy as np
 import os
+import urllib.request
 from app.ml.model_manager import model_manager
+from app.core.config import settings
 
 # Global wrapper for pickling
 def global_predict_wrapper(x):
@@ -16,11 +18,28 @@ def global_predict_wrapper(x):
 
 class SHAPEngine:
     _explainer = None
-    EXPLAINER_PATH = "shap_explainer.joblib"
-    
+    EXPLAINER_PATH = settings.SHAP_EXPLAINER_PATH
+
+    @classmethod
+    def _ensure_explainer_file(cls):
+        if os.path.exists(cls.EXPLAINER_PATH):
+            return
+        if settings.SHAP_EXPLAINER_URL:
+            explainer_dir = os.path.dirname(cls.EXPLAINER_PATH)
+            if explainer_dir:
+                os.makedirs(explainer_dir, exist_ok=True)
+            print(f"Downloading SHAP explainer from {settings.SHAP_EXPLAINER_URL}...")
+            urllib.request.urlretrieve(settings.SHAP_EXPLAINER_URL, cls.EXPLAINER_PATH)
+            return
+        if os.getenv("VERCEL"):
+            raise FileNotFoundError(
+                "SHAP explainer not available. Set SHAP_EXPLAINER_URL for Vercel deployment."
+            )
+
     @classmethod
     def get_explainer(cls):
         if cls._explainer is None:
+            cls._ensure_explainer_file()
             if os.path.exists(cls.EXPLAINER_PATH):
                 print(f"Loading SHAP explainer from {cls.EXPLAINER_PATH}...")
                 cls._explainer = joblib.load(cls.EXPLAINER_PATH)

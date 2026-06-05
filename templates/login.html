@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Femina AI</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        body {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #e0f2f1 0%, #f8f9fa 100%);
+        }
+
+        .auth-card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="auth-card">
+        <div class="logo">Femina AI</div>
+        <p class="subtitle">Welcome back. Please login.</p>
+
+        <form id="loginForm" onsubmit="handleLogin(event)">
+            <div class="form-group" style="text-align: left;">
+                <label>Email Address</label>
+                <input type="email" name="username" required placeholder="name@example.com">
+            </div>
+            <div class="form-group" style="text-align: left; margin-top: 15px;">
+                <label>Password</label>
+                <input type="password" name="password" required placeholder="••••••••">
+            </div>
+
+            <button type="submit" class="btn-primary" style="margin-top: 30px;">Login</button>
+        </form>
+
+        <p style="margin-top: 20px; font-size: 0.9em;">
+            New here? <a href="/register" style="color: var(--primary); text-decoration: none;">Create an account</a>.
+        </p>
+    </div>
+
+    <script>
+        async function handleLogin(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            // Convert to JSON
+            const data = Object.fromEntries(formData.entries());
+            // Rename username to email if backend expects email in schema, 
+            // BUT OAuth2PasswordRequestForm expects 'username' as key for email.
+            // Our Schema 'UserLogin' expects 'email'. 
+            // Let's adjust backend or frontend. 
+            // My backend route `login` accepts `UserLogin` pydantic model with `email`.
+            // So we send JSON.
+
+            try {
+                const response = await fetch('/api/v1/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: data.username, // mapping form 'username' to 'email'
+                        password: data.password
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    // Success
+                    localStorage.setItem('token', result.access_token);
+                    localStorage.setItem('user_name', result.user_name);
+                    window.location.href = '/dashboard';
+                } else {
+                    alert('Login Failed: ' + result.detail);
+                }
+            } catch (error) {
+                console.error(error);
+                alert('An error occurred. Please try again.');
+            }
+        }
+    </script>
+</body>
+
+</html>

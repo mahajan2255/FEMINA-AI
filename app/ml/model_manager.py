@@ -3,10 +3,12 @@ import pandas as pd
 import numpy as np
 import scipy.stats
 import os
+import urllib.request
+from app.core.config import settings
 
 class ModelManager:
     _model = None
-    MODEL_PATH = "pcos_nonlinear_stack_calibrated.joblib"
+    MODEL_PATH = settings.MODEL_PATH
     
     # Define expected feature columns in exact order of training
     FEATURE_COLUMNS = [
@@ -19,18 +21,29 @@ class ModelManager:
     ]
 
     @classmethod
+    def _ensure_model_file(cls):
+        if os.path.exists(cls.MODEL_PATH):
+            return
+        if settings.MODEL_URL:
+            os.makedirs(os.path.dirname(cls.MODEL_PATH) or ".", exist_ok=True)
+            print(f"Downloading model from {settings.MODEL_URL}...")
+            urllib.request.urlretrieve(settings.MODEL_URL, cls.MODEL_PATH)
+            return
+        raise FileNotFoundError(
+            f"Model file not found at {cls.MODEL_PATH}. "
+            "Set MODEL_URL to a hosted .joblib file for Vercel deployment."
+        )
+
+    @classmethod
     def load_model(cls):
         if cls._model is None:
-            if os.path.exists(cls.MODEL_PATH):
-                try:
-                    cls._model = joblib.load(cls.MODEL_PATH)
-                    print(f"Model loaded successfully from {cls.MODEL_PATH}")
-                except Exception as e:
-                    print(f"Error loading model: {e}")
-                    raise e
-            else:
-                print(f"Model file not found at {cls.MODEL_PATH}")
-                raise FileNotFoundError(f"Model file not found at {cls.MODEL_PATH}")
+            cls._ensure_model_file()
+            try:
+                cls._model = joblib.load(cls.MODEL_PATH)
+                print(f"Model loaded successfully from {cls.MODEL_PATH}")
+            except Exception as e:
+                print(f"Error loading model: {e}")
+                raise e
         return cls._model
 
     @classmethod

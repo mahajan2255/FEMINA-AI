@@ -149,7 +149,14 @@ lgbm_clf = OriginalLGBMClassifier(
     n_estimators=350, learning_rate=0.05, num_leaves=31, random_state=30, verbose=-1, n_jobs=1
 )
 
-cat_clf = OriginalCatBoostClassifier(
+class SklearnCompatibleCatBoostClassifier(OriginalCatBoostClassifier):
+    def __sklearn_tags__(self):
+        from sklearn.utils._tags import _DEFAULT_TAGS
+        tags = _DEFAULT_TAGS.copy()
+        tags["estimator_type"] = "classifier"
+        return tags
+
+cat_clf = SklearnCompatibleCatBoostClassifier(
     iterations=350, learning_rate=0.05, depth=6, verbose=0, random_state=30
 )
 
@@ -168,7 +175,7 @@ estimators_list = [
 manual_voting_clf = ManualVotingClassifier(estimators=estimators_list)
 
 # ------------------------------------------------------------------------------
-# 5. STACKING ENSEMBLE
+# 5. VOTING ENSEMBLE
 # ------------------------------------------------------------------------------
 # Full Pipeline
 model_pipeline = Pipeline([
@@ -185,8 +192,8 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratif
 # ------------------------------------------------------------------------------
 # 7. SAVE MODEL PARAM
 # ------------------------------------------------------------------------------
-OUTPUT_FILE = 'pcos_nonlinear_stack_calibrated.joblib'
-print("\nTraining Stacking Ensemble (this may take a few minutes)...")
+OUTPUT_FILE = 'pcos_voting_ensemble.joblib'
+print("\nTraining Voting Ensemble (this may take a few minutes)...")
 # Wrap in CalibratedClassifierCV as per new.ipynb
 calibrated_pipeline = CalibratedClassifierCV(model_pipeline, method='isotonic', cv=3)
 calibrated_pipeline.fit(X_train, y_train)

@@ -38,15 +38,27 @@ document.getElementById('pcosForm').addEventListener('submit', async function (e
         }
     }
 
+    const token = localStorage.getItem('token');
+    const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+    };
+
     try {
         // 1. Predict
         const response = await fetch('/api/v1/predict', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: headers,
             body: JSON.stringify(data)
         });
 
-        if (!response.ok) throw new Error("Server Error");
+        if (!response.ok) {
+            const errorData = await response.json();
+            const detail = errorData.detail
+                ? (typeof errorData.detail === 'string' ? errorData.detail : JSON.stringify(errorData.detail, null, 2))
+                : "Unknown Server Error (No Detail)";
+            throw new Error(`VALIDATION FAILED:\n${detail}`);
+        }
         const result = await response.json();
 
         // 2. Explain (Async)
@@ -69,10 +81,14 @@ async function fetchExplanation(inputData) {
     // Show loading state
     document.getElementById('explanation-section').innerHTML = '<p>Generating AI Explanation...</p>';
 
+    const token = localStorage.getItem('token');
     try {
         const response = await fetch('/api/v1/explain/local', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
             body: JSON.stringify(inputData)
         });
         if (response.ok) {
@@ -135,10 +151,14 @@ async function runPopulationAnalysis() {
     // Use last input or mock
     const data = window.lastInputData || { Age: 25, Weight_kg: 60 };
 
+    const token = localStorage.getItem('token');
     try {
         const response = await fetch('/api/v1/analysis/prototypes', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
             body: JSON.stringify(data)
         });
 

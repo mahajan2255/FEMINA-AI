@@ -17,7 +17,7 @@ def get_nearby_doctors(lat, lon, radius_km=10):
     (
       node["amenity"="doctors"](around:{radius_m},{lat},{lon});
       node["healthcare"="doctor"](around:{radius_m},{lat},{lon});
-      node["amenity"="clinic"](around:{radius_m},{lat},{lon});
+      node["amenity"="clinic"](around:{radius_m},{lat},{lon});  
     );
     out body;
     """

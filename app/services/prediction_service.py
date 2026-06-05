@@ -22,7 +22,7 @@ class PredictionService:
         return recs
 
     @staticmethod
-    def predict_risk(input_data: PCOSInput, db: Session):
+    def predict_risk(input_data: PCOSInput, db: Session, user=None):
         # Convert Pydantic model to dict
         data_dict = input_data.dict()
         
@@ -52,15 +52,26 @@ class PredictionService:
         recommendations = PredictionService.get_recommendations(data_dict)
         
         # 5. Save to Memory (Database)
-        # Check if patient exists? For now, we just log every prediction as a report.
-        # In a real app, we'd handle user authentication here.
+        # Check if user exists
+        user_id = user.id if user else None
+        
         db_report = PatientReport(
-            patient_id="anonymous", # Placeholder
+            user_id=user_id, # Link to authenticated user
             input_data=data_dict,
             prediction=int(prediction), # Explicit cast to native python int
             probability=float(prob),    # Explicit cast to native python float
             risk_level=risk,
-            recommendations=recommendations
+            recommendations=recommendations,
+            # We should probably calculate SHAP here too if we want it in the report object immediately
+            # or it can be updated later. For now, we are creating it without SHAP values column population in this specific snippet to match previous code style 
+            # (previous code didn't seem to invoke SHAP here, but predict route did? 
+            # Actually previous predict route in FLASKAPP did invoke SHAP, but PREDICTION_SERVICE in fastAPI didn't seem to?
+            # Let's check imports. shap_values column exists in PatientReport.
+            # I will leave SHAP out of this service method to avoid circular imports or complexity, 
+            # assuming SHAP is handled separately or I should add it.
+            # Wait, PatientReport has shap_values column. It's better to populate it.
+            # But getting SHAP is expensive. Maybe keep it separate.
+            # For now just adding user_id.
         )
         db.add(db_report)
         db.commit()
