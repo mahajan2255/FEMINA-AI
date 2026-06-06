@@ -1,19 +1,35 @@
-🌸 Femina-AI
-Femina-AI is a machine learning-powered application designed to assist in the prediction and analysis of Polycystic Ovary Syndrome (PCOS). Built with a Python/Flask backend, this project utilizes advanced ML models alongside Explainable AI (SHAP) to provide transparent, data-driven medical insights.
 
-✨ Features
-PCOS Risk Prediction: Leverages trained machine learning models to assess PCOS probability based on patient data metrics.
-Explainable AI (XAI): Integrates SHAP (SHapley Additive exPlanations) to explain model predictions, providing transparency for medical professionals and users.
-Doctor Service Module: Includes built-in services (doctor_service.py) for handling medical professional interactions or specific clinical logic.
-Database Management: Uses SQLite for lightweight, efficient data storage with automated scripts for resetting and managing the database.
-Deployment Ready: Comes pre-configured for containerized deployment with Dockerfile and serverless deployment with vercel.json.
-🛠️ Technology Stack
-Backend: Python 3.x, Flask (flaskapp.py)
-Machine Learning: scikit-learn, SHAP (create_shap_explainer.py), Pandas
-Database: SQLite (pcos_db.db)
-Deployment: Docker, Vercel
-Package Management: requirements.txt, pyproject.toml
-📁 Project Structure
+
+```markdown
+# 🌸 Femina-AI
+
+**Femina-AI** is a machine learning-powered application designed to assist in the prediction and analysis of Polycystic Ovary Syndrome (PCOS). Built with a Python/Flask backend, this project utilizes advanced ML models alongside Explainable AI (SHAP) to provide transparent, data-driven medical insights.
+
+---
+
+## ✨ Features
+
+* **PCOS Risk Prediction:** Leverages trained machine learning models to assess PCOS probability based on patient data metrics.
+* **Explainable AI (XAI):** Integrates SHAP (SHapley Additive exPlanations) to explain model predictions, providing transparency for medical professionals and users.
+* **Doctor Service Module:** Includes built-in services (`doctor_service.py`) for handling medical professional interactions or specific clinical logic.
+* **Database Management:** Uses SQLite for lightweight, efficient data storage with automated scripts for resetting and managing the database.
+* **Deployment Ready:** Comes pre-configured for containerized deployment with `Dockerfile` and serverless deployment with `vercel.json`.
+
+---
+
+## 🛠️ Technology Stack
+
+* **Backend:** Python 3.x, Flask (`flaskapp.py`)
+* **Machine Learning:** scikit-learn, SHAP (`create_shap_explainer.py`), Pandas
+* **Database:** SQLite (`pcos_db.db`)
+* **Deployment:** Docker, Vercel
+* **Package Management:** `requirements.txt`, `pyproject.toml`
+
+---
+
+## 📁 Project Structure
+
+```text
 Femina-AI/
 ├── .env.example                 # Environment variables template
 ├── Dockerfile                   # Docker container configuration
@@ -32,39 +48,91 @@ Femina-AI/
 ├── requirements.txt             # Python dependencies
 └── pyproject.toml               # Python project build requirements
 
-🚀 Getting Started
-Prerequisites
-Python 3.8+ installed on your local machine.
-pip (Python package manager).
-Installation & Setup
-Clone the repository:
+```
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+* Python 3.8+ installed on your local machine.
+* `pip` (Python package manager).
+
+### Installation & Setup
+
+1. **Clone the repository:**
+```bash
 git clone [https://github.com/your-username/femina-ai.git](https://github.com/your-username/femina-ai.git)
 cd femina-ai
-Set up a virtual environment (Recommended):
+
+```
+
+
+2. **Set up a virtual environment (Recommended):**
+```bash
 python -m venv venv
 source venv/bin/activate  # On Windows use: venv\Scripts\activate
-Install dependencies:
-pip install -r requirements.txt
-Configure Environment Variables:
-Copy the .env.example file to a new file named .env.
-Fill in any necessary API keys or secret configurations.
-cp .env.example .env
-Run the Application:
-python run_server.py
-The server should now be running locally (usually on http://localhost:5000 or http://127.0.0.1:5000).
 
-🧠 Machine Learning & Data Pipeline
+```
+
+
+3. **Install dependencies:**
+```bash
+pip install -r requirements.txt
+
+```
+
+
+4. **Configure Environment Variables:**
+* Copy the `.env.example` file to a new file named `.env`.
+* Fill in any necessary API keys or secret configurations.
+
+
+```bash
+cp .env.example .env
+
+```
+
+
+5. **Run the Application:**
+```bash
+python run_server.py
+
+```
+
+
+*The server should now be running locally (usually on `http://localhost:5000` or `http://127.0.0.1:5000`).*
+
+---
+
+## 🧠 Machine Learning & Data Pipeline
+
 If you want to retrain the model or test the data pipeline locally:
 
-Dataset: The project utilizes a synthetic dataset of 50,000 records (pcos_synthetic_50000.csv).
-Train the Model: Run python train_model.py to generate the latest model artifacts.
-Generate Explainer: Run python create_shap_explainer.py to update the Explainable AI SHAP components.
-Test Predictions: Use python test_predict.py to verify that the newly trained model outputs the expected results.
-🌐 Deployment
-Using Docker
+1. **Dataset:** The project utilizes a synthetic dataset of 50,000 records (`pcos_synthetic_50000.csv`).
+2. **Train the Model:** Run `python train_model.py` to generate the latest model artifacts.
+3. **Generate Explainer:** Run `python create_shap_explainer.py` to update the Explainable AI SHAP components.
+4. **Test Predictions:** Use `python test_predict.py` to verify that the newly trained model outputs the expected results.
+
+---
+
+## 🌐 Deployment
+
+### Using Docker
+
 You can containerize the application for deployment anywhere using the provided Dockerfile:
 
+```bash
 docker build -t femina-ai .
 docker run -p 5000:5000 femina-ai
-Using Vercel
-The project includes a vercel.json file, making it ready for immediate deployment on Vercel's serverless infrastructure. Simply connect your GitHub repository to Vercel and it will automatically deploy based on these configurations.
+
+```
+
+### Using Vercel
+
+The project includes a `vercel.json` file, making it ready for immediate deployment on Vercel's serverless infrastructure. Simply connect your GitHub repository to Vercel and it will automatically deploy based on these configurations.
+
+```
+
+```
